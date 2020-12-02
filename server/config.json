@@ -1,0 +1,7 @@
+{
+    "dataDir": "data",
+    "huntConfig": {
+        "name": "bonanza",
+        "numCodes": 15
+    }
+}
