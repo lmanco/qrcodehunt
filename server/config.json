@@ -1,5 +1,6 @@
 {
     "dataDir": "data",
+    "baseUrl": "http://localhost:8081",
     "huntConfig": {
         "name": "bonanza",
         "numCodes": 15

@@ -5,9 +5,19 @@ import express from 'express';
 import fs from 'fs';
 import ConfigLoader from './ConfigLoader.js';
 import DALInit from './DAL/DALInit.js';
+import * as uuid from 'uuid';
+import CodeRepository from './DAL/CodeRepository.js';
+import DataWriter from './DAL/Util/DataWriter.js';
+import DataReader from './DAL/Util/DataReader.js';
+import qrcode from 'qrcode';
+import jimp from 'jimp';
 
 const config = new ConfigLoader(fs, process, console).config;
-new DALInit(config, fs, console).init();
+const dataRoot = `${config.dataDir}/${config.huntConfig.name}`;
+const dataWriter = new DataWriter(fs, dataRoot, console);
+const dataReader = new DataReader(fs, dataRoot, console);
+const codeRepository = new CodeRepository(dataWriter, dataReader, dataRoot, config.baseUrl, fs, qrcode, jimp);
+new DALInit(config, fs, console, codeRepository, uuid).init();
 
 const app = express();
 app.use(bodyParser.json());
