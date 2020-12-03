@@ -14,7 +14,7 @@ export default class UserRepository {
             password: this.bcrypt.hashSync(user.password, 10),
             codesFound: []
         };
-        this.dataWriter.write(UserRepository.dirName, userData.name.toLowerCase(), userData);
+        await this.dataWriter.write(UserRepository.dirName, userData.name.toLowerCase(), userData);
         return userData;
     }
 

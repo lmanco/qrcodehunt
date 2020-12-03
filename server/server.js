@@ -16,22 +16,39 @@ import UserRepository from './DAL/UserRepository.js';
 import bcrypt from 'bcryptjs';
 import UsersRoutes from './routes/UsersRoutes.js';
 import { StatusCodes } from 'http-status-codes';
+import jwt from 'express-jwt';
+import LoginTokensRoutes from './routes/LoginTokensRoutes.js';
+import LoginTokenRepository from './DAL/LoginTokenRepository.js';
+import LoginTokensController from './controllers/LoginTokensController.js';
+import jsonwebtoken from 'jsonwebtoken';
 
 const config = new ConfigLoader(fs, process, console).config;
 const dataRoot = `${config.dataDir}/${config.huntConfig.name}`;
 const dataWriter = new DataWriter(fs, dataRoot, console);
 const dataReader = new DataReader(fs, dataRoot, console);
 const codeRepository = new CodeRepository(dataWriter, dataReader, dataRoot, config.baseUrl, fs, qrcode, jimp);
-const userRepository = new UserRepository(dataWriter, dataReader, bcrypt)
+const userRepository = new UserRepository(dataWriter, dataReader, bcrypt);
+const loginTokenRepository = new LoginTokenRepository(dataWriter, dataReader, config, jsonwebtoken, uuid);
 new DALInit(config, fs, console, codeRepository, uuid).init();
 
 const app = express();
 app.use(bodyParser.json());
 app.use(compression());
 app.use(cors());
+app.use(jwt({ secret: config.jwtSecret, algorithms: ['HS256']}).unless({path: [
+    { url: '/api/login-tokens', methods: ['POST'] },
+    { url: '/api/users', methods: ['POST'] }
+]}));
+app.use(function (err, req, res, next) {
+  if (err.name === 'UnauthorizedError')
+    res.status(StatusCodes.UNAUTHORIZED).json({ error: 'Unauthorized' });
+});
 
 const usersController = new UsersController(userRepository, codeRepository);
-app.use('/users', new UsersRoutes(express, usersController).router);
+app.use('/api/users', new UsersRoutes(express, usersController).router);
+
+const loginTokensController = new LoginTokensController(loginTokenRepository, userRepository, bcrypt);
+app.use('/api/login-tokens', new LoginTokensRoutes(express, loginTokensController).router);
 
 app.use(express.static(import.meta.url + '/public/'));
 app.get(/.*/, (req, res) => {

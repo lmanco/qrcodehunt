@@ -16,6 +16,7 @@ export default class UsersController {
             res.status(StatusCodes.OK).json(user);
         }
         catch (err) {
+            console.error(err);
             res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: `${err}` });
         }
     }
@@ -38,7 +39,7 @@ export default class UsersController {
             res.status(StatusCodes.CREATED).json(createdUser);
         }
         catch (err) {
-            console.log(err);
+            console.error(err);
             res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: `${err}` });
         }
     }
@@ -65,6 +66,7 @@ export default class UsersController {
             res.status(StatusCodes.OK).json(result);
         }
         catch (err) {
+            console.error(err);
             res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: `${err}` });
         }
     }
