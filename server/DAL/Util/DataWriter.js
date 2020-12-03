@@ -1,3 +1,5 @@
+import { promisify } from 'util';
+
 export default class DataWriter {
 
     constructor(fs, dataRoot, logger) {
@@ -15,7 +17,7 @@ export default class DataWriter {
         const filePath = `${dataPath}/${fileName}`;
         const dataString = JSON.stringify(data);
         try {
-            await this.fs.writeFile(filePath, dataString, () => {});
+            await promisify(this.fs.writeFile)(filePath, dataString);
         }
         catch (err) {
             this.logger.error(`Failed to write ${filePath} with data ${dataString}:`);

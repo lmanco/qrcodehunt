@@ -1,3 +1,5 @@
+import { promisify } from 'util';
+
 export default class CodeRepository {
 
     constructor(dataWriter, dataReader, dataRoot, baseUrl, fs, qrcode, jimp) {
@@ -11,12 +13,14 @@ export default class CodeRepository {
     }
 
     async createOrUpdate(codes) {
-        await this.dataWriter.write('', 'codes', codes);
+        const codesData = codes.filter(code => code.num && code.key)
+            .map(code => ({ key: code.key, num: code.num }));
+        await this.dataWriter.write('', 'codes', codesData);
         const codeImagesDir = `${this.dataRoot}/code_images`;
-        if (await this.fs.exists(codeImagesDir, () => {}))
-            await this.fs.rmdir(codeImagesDir, { recursive: true }, () => {});
-        await this.fs.mkdir(codeImagesDir, { recursive: true }, () => {});
-        await Promise.all(codes.map(code => this.createImage(code, codeImagesDir)));
+        if (await promisify(this.fs.exists)(codeImagesDir))
+            await promisify(this.fs.rmdir)(codeImagesDir, { recursive: true });
+        await promisify(this.fs.mkdir)(codeImagesDir, { recursive: true });
+        await Promise.all(codesData.map(code => this.createImage(code, codeImagesDir)));
     }
 
     async createImage(code, codeImagesDir) {

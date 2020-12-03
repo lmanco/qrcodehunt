@@ -7,23 +7,65 @@ export default class UsersController {
         this.codeRepository = codeRepository;
     }
 
-    async create(req, res) {
+    async findByName(req, res) {
         try {
-            const user = await this.userRepository.getUserByName(req.body.name);
-            if (user)
-                res.status(StatusCodes.CONFLICT).json({ error: `user ${req.body.name} already exists` });
-            const createdUser = await this.userRepository.create(req.body);
-            res.status(StatusCodes.CREATED).json(createdUser)
+            const user = await this.userRepository.getUserByName(req.params.name);
+            if (!user)
+                res.status(StatusCodes.NOT_FOUND).json({ error: `user ${req.params.name} not found` });
+            delete user.password;
+            res.status(StatusCodes.OK).json(user);
         }
         catch (err) {
             res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: `${err}` });
         }
     }
 
+    async create(req, res) {
+        try {
+            const error = this.getNewUserError(req.body);
+            if (error) {
+                res.status(StatusCodes.BAD_REQUEST).json({ error: error });
+                return;
+            }
+            const user = await this.userRepository.getUserByName(req.body.name);
+            if (user) {
+                res.status(StatusCodes.CONFLICT)
+                    .json({ error: `user ${req.body.name} already exists` });
+                return;
+            }
+            const createdUser = await this.userRepository.create(req.body);
+            delete createdUser.password;
+            res.status(StatusCodes.CREATED).json(createdUser);
+        }
+        catch (err) {
+            console.log(err);
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: `${err}` });
+        }
+    }
+
+    getNewUserError(reqBody) {
+        if (!reqBody.name)
+            return 'name is required';
+        if (!/^[a-z0-9_.@()-]+$/i.test(reqBody.name))
+            return 'name may only contain alphanumeric characters, _, ., @, (, ), and -';
+        if (!reqBody.password)
+            return 'password is required';
+        if (/\s/.test(reqBody.password))
+            return 'password may not contain spaces';
+    }
+
     async updateCodesFound(req, res) {
-        const user = await this.userRepository.getUserByName(req.params.name);
-        if (!user)
-            res.status(StatusCodes.NOT_FOUND).json({ error: `user ${req.params.name} not found` });
-        await this.codeRepository.getCodeByKey(req.params.key);
+        try {
+            const user = await this.userRepository.getUserByName(req.params.name);
+            if (!user)
+                res.status(StatusCodes.NOT_FOUND).json({ error: `user ${req.params.name} not found` });
+            const code = await this.codeRepository.getCodeByKey(req.params.key);
+            const result = await this.userRepository.addCodeFound(user.name, code);
+            delete result.password;
+            res.status(StatusCodes.OK).json(result);
+        }
+        catch (err) {
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: `${err}` });
+        }
     }
 }
