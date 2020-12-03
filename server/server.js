@@ -11,6 +11,8 @@ import DataWriter from './DAL/Util/DataWriter.js';
 import DataReader from './DAL/Util/DataReader.js';
 import qrcode from 'qrcode';
 import jimp from 'jimp';
+import UsersController from './controllers/UsersController.js';
+import UserRepository from './DAL/UserRepository.js';
 
 const config = new ConfigLoader(fs, process, console).config;
 const dataRoot = `${config.dataDir}/${config.huntConfig.name}`;
@@ -23,6 +25,10 @@ const app = express();
 app.use(bodyParser.json());
 app.use(compression());
 app.use(cors());
+
+//const usersController = new UsersController(userRepository, codeRepository);
+//const usersRouter = express.Router();
+//router
 
 app.use(express.static(import.meta.url + '/public/'));
 app.get(/.*/, (req, res) => {

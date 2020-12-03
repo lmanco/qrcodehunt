@@ -30,6 +30,12 @@ export default class CodeRepository {
             image.bitmap.width, image.bitmap.height).write(imageFile);
     }
 
+    async getCodeByKey(codeKey) {
+        const codes = await this.getCodes();
+        const matches = codes.filter(code => code.key === codeKey);
+        return matches.length ? matches[0] : null;
+    }
+
     async getCodes() {
         const codes = await this.dataReader.read('', 'codes');
         return codes ? codes : [];
