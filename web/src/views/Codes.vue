@@ -2,8 +2,13 @@
     <div v-if="loggedIn" class="container">
         <h1>Hello, {{ name }}!</h1>
         <div>
-            You have found {{ codesCount }} codes.
+            You have found {{ codesCount }} codes. You are in {{ position }} place{{ tiedText }}
         </div>
+        <ul>
+            <li v-for="(code, index) in codesFound" :key="index">
+                {{ index + 1 }}: {{ code }}
+            </li>
+        </ul>
         <logout-button />
     </div>
 </template>
@@ -18,6 +23,7 @@
 
 <script>
 import LogoutButton from '../components/LogoutButton.vue';
+import numeral from 'numeral';
 
 export default {
     components: { LogoutButton },
@@ -28,12 +34,22 @@ export default {
             name: '',
             rank: -1,
             numTied: 0,
-            loggedIn: false,
+            loggedIn: false
         };
     },
     computed: {
         codesCount() {
             return this.codesFound.filter(x => x).length;
+        },
+        position() {
+            return numeral(this.rank).format('0o');
+        },
+        tiedText() {
+            if (this.numTied === 0)
+                return '.';
+            const prefix = ` and are tied with ${this.numTied}`;
+            const suffix = (this.numTied === 1) ? ' other.' : ' others.';
+            return `${prefix}${suffix}`;
         }
     },
     methods: {
