@@ -22,6 +22,7 @@ import session from 'express-session';
 import sessionFileStore from 'session-file-store';
 import unless from 'express-unless';
 import { fileURLToPath } from 'url';
+import path from 'path';
 
 const config = new ConfigLoader(fs, process, console).config;
 const dataRoot = `${config.dataDir}/${config.huntConfig.name}`;
@@ -55,6 +56,7 @@ app.use(auth.unless({
     path: [
         { url: '/api/users', methods: ['POST'] },
         { url: '/api/login', methods: ['POST'] },
+        { url: /^\/(?!(api\/))/ },
     ]
 }));
 
@@ -69,7 +71,7 @@ app.all('/api/*', (req, res) => {
     res.status(StatusCodes.NOT_FOUND).json({ error: 'Resource not found' });
 });
 
-const __dirname = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 app.use(express.static(__dirname + '/public/'));
 app.get(/.*/, (req, res) => {
     const uiPath = `${__dirname}/public/index.html`;
