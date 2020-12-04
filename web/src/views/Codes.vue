@@ -6,7 +6,8 @@
         </div>
         <ul>
             <li v-for="(code, index) in codesFound" :key="index">
-                {{ index + 1 }}: {{ code }}
+                <input type="checkbox" disabled :checked="code"/>
+                Code {{ index + 1 }}
             </li>
         </ul>
         <logout-button />
@@ -18,6 +19,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+ul {
+    list-style-type: none;
 }
 </style>
 
