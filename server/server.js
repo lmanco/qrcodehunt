@@ -58,7 +58,7 @@ app.use(auth.unless({
     ]
 }));
 
-const usersController = new UsersController(userRepository, codeRepository);
+const usersController = new UsersController(userRepository, codeRepository, config);
 app.use('/api/users', new UsersRoutes(express, usersController).router);
 
 const loginController = new LoginController(userRepository, bcrypt);
