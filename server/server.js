@@ -64,6 +64,7 @@ app.use('/api/users', new UsersRoutes(express, usersController).router);
 
 const loginController = new LoginController(userRepository, bcrypt);
 app.use('/api/login', new LoginRoutes(express, loginController).router);
+app.post('/api/logout', loginController.logout);
 
 app.all('/api/*', (req, res) => {
     res.status(StatusCodes.NOT_FOUND).json({ error: 'Resource not found' });

@@ -30,6 +30,11 @@ export default class LoginController {
         }
     }
 
+    logout(req, res) {
+        req.session.destroy();
+        res.status(StatusCodes.OK).json();
+    }
+
     getLoginError(reqBody) {
         if (!reqBody.username)
             return 'username is required';
