@@ -14,7 +14,7 @@ export default class UsersController {
                 res.status(StatusCodes.NOT_FOUND).json({ error: `user ${req.params.name} not found` });
                 return;
             }
-            if (req.session.user !== user.name) {
+            if (req.session.user.toLowerCase() !== user.name.toLowerCase()) {
                 res.status(StatusCodes.FORBIDDEN).json({ error: 'Forbidden' });
                 return;
             }
@@ -85,7 +85,7 @@ export default class UsersController {
                 res.status(StatusCodes.NOT_FOUND).json({ error: `user ${req.params.name} not found` });
                 return;
             }
-            if (req.session.user !== user.name) {
+            if (req.session.user.toLowerCase() !== user.name.toLowerCase()) {
                 res.status(StatusCodes.FORBIDDEN).json({ error: 'Forbidden' });
                 return;
             }
