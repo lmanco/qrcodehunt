@@ -92,12 +92,15 @@ export default class UsersController {
                 res.status(StatusCodes.FORBIDDEN).json({ error: 'Forbidden' });
                 return;
             }
-            if (user.codesFound.every(code => code)) {
-                delete user.password;
-                res.status(StatusCodes.OK).json(user);
+            const code = await this.codeRepository.getCodeByKey(req.params.key);
+            if (!code) {
+                res.status(StatusCodes.BAD_REQUEST).json({ error: 'invalid code' });
                 return;
             }
-            const code = await this.codeRepository.getCodeByKey(req.params.key);
+            if (user.codesFound[code.num-1]) {
+                res.status(StatusCodes.CONFLICT).json({ error: 'code already found' });
+                return;
+            }
             const result = await this.userRepository.addCodeFound(user.name, code);
             delete result.password;
             if (result.codesFound.every(code => code))
