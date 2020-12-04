@@ -6,7 +6,7 @@ export default class CodeRepository {
         this.dataWriter = dataWriter;
         this.dataReader = dataReader;
         this.dataRoot = dataRoot;
-        this.baseUrl = baseUrl;
+        this.baseUrl = baseUrl.replace(/\/$/, '');
         this.fs = fs;
         this.qrcode = qrcode;
         this.jimp = jimp;
@@ -25,13 +25,18 @@ export default class CodeRepository {
 
     async createImage(code, codeImagesDir) {
         const imageFile = `${codeImagesDir}/${code.key}.png`;
-        const url = `${this.baseUrl}/${code.key}`
+        const url = `${this.getHost()}/${code.key}`
         await this.qrcode.toFile(imageFile, url);
         const image = await this.jimp.read(imageFile);
         const font = await this.jimp.loadFont(this.jimp.FONT_SANS_16_BLACK);
         const printOptions = {text: `${code.num}`, alignmentX: this.jimp.HORIZONTAL_ALIGN_CENTER };
         image.print(font, 0, image.bitmap.height - 16, printOptions, 
             image.bitmap.width, image.bitmap.height).write(imageFile);
+    }
+
+    getHost() {
+        return (/^.*:\d+$/.test(this.baseUrl) || process.env.PORT === '80') ?
+            this.baseUrl : `${this.baseUrl}:${process.env.PORT || 8081}`;
     }
 
     async getCodeByKey(codeKey) {
