@@ -1,8 +1,15 @@
 <template>
 <div class="login-form">
-    <input v-model="username" type="text" name="username" />
-    <input v-model="password" type="password" name="password" />
-    <button v-on:click="submitLogin" v-bind:disabled="loginButtonDisabled()" name="login">Login</button>
+    <div class="input">
+        <label for="username">Username:&nbsp;</label>
+        <input v-model="username" type="text" name="username" />
+    </div>
+    <div class="input">
+        <label for="password">Password:&nbsp;</label>
+        <input v-model="password" type="password" name="password" />
+     </div>
+    <button id="login" v-on:click="submitLogin" v-bind:disabled="loginButtonDisabled()" name="login">Login</button>
+    <div class="error">{{ error }}</div>
 </div>
 </template>
 
@@ -11,6 +18,16 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+.input {
+    margin-bottom: 8px;
+}
+#login {
+    margin-bottom: 8px;
+}
+.error {
+    color: red;
+    height: 20px;
 }
 </style>
 
@@ -24,6 +41,7 @@ export default {
             username: '',
             password: '',
             state: READY,
+            error: ''
         };
     },
     methods: {
@@ -48,8 +66,10 @@ export default {
             }).then((response) => {
                 if (response.ok) {
                     this.$router.push('/codes');
+                    this.error = '';
                 } else {
-                    this.state == READY;
+                    this.state = READY;
+                    response.json().then(res => this.error = res.error);
                 }
             })
         },
