@@ -1,0 +1,15 @@
+{
+    "dataDir": "data",
+    "baseUrl": "http://localhost:8081",
+    "huntConfig": {
+        "name": "bonanza",
+        "numCodes": 15
+    },
+    "sessionSecret": "secret-session-key",
+    "mailer": {
+        "service": "gmail",
+        "user": "----@gmail.com",
+        "pass": "pass"
+    },
+    "emailResultsTo": "????@gmail.com"
+}
