@@ -30,7 +30,7 @@ export default {
         },
     },
     async mounted() {
-        const code = this.$route.code;
+        const code = this.$route.params.code;
         const loginResponse = await fetch('/api/users/m/e', {
             credentials: 'same-origin',
         });
