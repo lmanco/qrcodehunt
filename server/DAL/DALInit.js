@@ -1,10 +1,11 @@
 export default class DALInit {
 
-    constructor(config, fs, logger, codeRepository, uuid) {
+    constructor(config, fs, logger, codeRepository, userRepository, uuid) {
         this.config = config;
         this.fs = fs;
         this.logger = logger;
         this.codeRepository = codeRepository;
+        this.userRepository = userRepository;
         this.uuid = uuid;
     }
 
@@ -53,6 +54,7 @@ export default class DALInit {
                 newCodes = existingCodes.concat(newCodes);
         }
         this.codeRepository.createOrUpdate(newCodes)
-            .catch(err => this.logger.error(`Failed to create new codes:\n${err}`))
+            .catch(err => this.logger.error(`Failed to create new codes:\n${err}`));
+        this.userRepository.updateNumCodes(existingCodes.length, newCodes.length);
     }
 }

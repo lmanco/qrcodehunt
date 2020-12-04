@@ -45,4 +45,10 @@ export default class DataReader {
             return [];
         }
     }
+
+    readDirJSONFilesSync(dirName) {
+        const path = `${this.dataRoot}/${dirName}`;
+        const files = this.fs.readdirSync(path);
+        return files.map(file => this.readSync(dirName, file));
+    }
 }

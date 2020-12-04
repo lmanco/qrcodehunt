@@ -29,8 +29,8 @@ const dataRoot = `${config.dataDir}/${config.huntConfig.name}`;
 const dataWriter = new DataWriter(fs, dataRoot, console);
 const dataReader = new DataReader(fs, dataRoot, console);
 const codeRepository = new CodeRepository(dataWriter, dataReader, dataRoot, config.baseUrl, fs, qrcode, jimp);
-const userRepository = new UserRepository(dataWriter, dataReader, bcrypt);
-new DALInit(config, fs, console, codeRepository, uuid).init();
+const userRepository = new UserRepository(dataWriter, dataReader, bcrypt, config.huntConfig.numCodes);
+new DALInit(config, fs, console, codeRepository, userRepository, uuid).init();
 
 const app = express();
 const FileStore = sessionFileStore(session);

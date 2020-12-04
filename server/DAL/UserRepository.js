@@ -2,17 +2,18 @@ export default class UserRepository {
 
     static dirName = 'users';
 
-    constructor(dataWriter, dataReader, bcrypt) {
+    constructor(dataWriter, dataReader, bcrypt, numCodes) {
         this.dataWriter = dataWriter;
         this.dataReader = dataReader;
         this.bcrypt = bcrypt;
+        this.numCodes = numCodes;
     }
 
     async create(user) {
         const userData = {
             name: user.name,
             password: this.bcrypt.hashSync(user.password, 10),
-            codesFound: []
+            codesFound: Array.from({ length: this.numCodes }, () => false)
         };
         await this.dataWriter.write(UserRepository.dirName, userData.name.toLowerCase(), userData);
         return userData;
@@ -43,10 +44,21 @@ export default class UserRepository {
         const user = await this.getUserByName(userName);
         if (!user)
             return null;
-        if (!code || user.codesFound.includes(code.num))
+        if (!code || code.num > user.codesFound.length || code.num < 1)
             return user;
-        user.codesFound.push(code.num);
+        user.codesFound[code.num - 1] = true;
         this.dataWriter.write(UserRepository.dirName, userName.toLowerCase(), user);
         return user;
+    }
+
+    updateNumCodes(numOldCodes, newNumCodes) {
+        const users = this.dataReader.readDirJSONFilesSync(UserRepository.dirName);
+        users.forEach(user => {
+            if (user.codesFound.length !== newNumCodes) {
+                user.codesFound = (numNewCodes < user.codesFound.length) ?
+                    user.codesFound.slice(0, newNumCodes) :
+                    user.codesFound = user.codesFound.concat(Array.from({ length: numNewCodes - numOldCodes }, () => false))
+            }
+        })
     }
 }
