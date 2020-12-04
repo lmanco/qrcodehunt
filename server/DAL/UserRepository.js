@@ -54,6 +54,9 @@ export default class UserRepository {
             return user;
         user.codesFound[code.num - 1] = true;
         this.dataWriter.write(UserRepository.dirName, userName.toLowerCase(), user);
+        const allUsers = await this.dataReader.readDirJSONFiles(UserRepository.dirName);
+        user.rank = this.getUserRank(user, allUsers);
+        user.numTied = this.getNumUsersTied(user, allUsers);
         return user;
     }
 
