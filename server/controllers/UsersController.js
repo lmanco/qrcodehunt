@@ -10,8 +10,14 @@ export default class UsersController {
     async findByName(req, res) {
         try {
             const user = await this.userRepository.getUserByName(req.params.name);
-            if (!user)
+            if (req.session.user !== user.name) {
+                res.status(StatusCodes.FORBIDDEN).json({ error: 'Forbidden' });
+                return;
+            }
+            if (!user) {
                 res.status(StatusCodes.NOT_FOUND).json({ error: `user ${req.params.name} not found` });
+                return;
+            }
             delete user.password;
             res.status(StatusCodes.OK).json(user);
         }
@@ -36,6 +42,7 @@ export default class UsersController {
             }
             const createdUser = await this.userRepository.create(req.body);
             delete createdUser.password;
+            req.session.user = createdUser.name;
             res.status(StatusCodes.CREATED).json(createdUser);
         }
         catch (err) {
@@ -58,8 +65,10 @@ export default class UsersController {
     async updateCodesFound(req, res) {
         try {
             const user = await this.userRepository.getUserByName(req.params.name);
-            if (!user)
+            if (!user) {
                 res.status(StatusCodes.NOT_FOUND).json({ error: `user ${req.params.name} not found` });
+                return;
+            }
             const code = await this.codeRepository.getCodeByKey(req.params.key);
             const result = await this.userRepository.addCodeFound(user.name, code);
             delete result.password;

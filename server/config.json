@@ -5,5 +5,5 @@
         "name": "bonanza",
         "numCodes": 15
     },
-    "jwtSecret": "secret-jwt-key"
+    "sessionSecret": "secret-session-key"
 }

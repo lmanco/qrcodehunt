@@ -23,7 +23,14 @@ export default class DALInit {
     
     generateCodes() {
         const numCodes = this.config.huntConfig.numCodes;
-        let existingCodes = this.codeRepository.getCodesSync();
+        let existingCodes = [];
+        try {
+            existingCodes = this.codeRepository.getCodesSync();
+        }
+        catch (err) {
+            if (err.name !== 'SyntaxError' || err.message !== 'Unexpected end of JSON input')
+                throw err;
+        }
         if (!Array.isArray(existingCodes))
             existingCodes = [];
         let newCodes = [];
