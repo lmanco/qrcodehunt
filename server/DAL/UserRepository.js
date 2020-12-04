@@ -51,13 +51,14 @@ export default class UserRepository {
         return user;
     }
 
-    updateNumCodes(numOldCodes, newNumCodes) {
+    updateNumCodes(oldNumCodes, newNumCodes) {
         const users = this.dataReader.readDirJSONFilesSync(UserRepository.dirName);
         users.forEach(user => {
             if (user.codesFound.length !== newNumCodes) {
-                user.codesFound = (numNewCodes < user.codesFound.length) ?
+                user.codesFound = (newNumCodes < user.codesFound.length) ?
                     user.codesFound.slice(0, newNumCodes) :
-                    user.codesFound = user.codesFound.concat(Array.from({ length: numNewCodes - numOldCodes }, () => false))
+                    user.codesFound = user.codesFound.concat(Array.from({ length: newNumCodes - oldNumCodes }, () => false))
+                this.dataWriter.write(UserRepository.dirName, user.name.toLowerCase(), user);
             }
         })
     }
