@@ -10,6 +10,10 @@ export default class UsersController {
     async findByName(req, res) {
         try {
             const user = await this.userRepository.getUserByName(req.params.name);
+            if (!user) {
+                res.status(StatusCodes.NOT_FOUND).json({ error: `user ${req.params.name} not found` });
+                return;
+            }
             if (req.session.user !== user.name) {
                 res.status(StatusCodes.FORBIDDEN).json({ error: 'Forbidden' });
                 return;
