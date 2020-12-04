@@ -48,7 +48,9 @@ export default class DataReader {
 
     readDirJSONFilesSync(dirName) {
         const path = `${this.dataRoot}/${dirName}`;
-        const files = this.fs.readdirSync(path);
+        let files = [];
+        if (this.fs.existsSync(path))
+            files = this.fs.readdirSync(path);
         return files.map(file => this.readSync(dirName, file));
     }
 }

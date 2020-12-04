@@ -21,7 +21,6 @@ import LoginController from './controllers/LoginController.js';
 import session from 'express-session';
 import sessionFileStore from 'session-file-store';
 import unless from 'express-unless';
-import path from 'path';
 import { fileURLToPath } from 'url';
 
 const config = new ConfigLoader(fs, process, console).config;
