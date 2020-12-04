@@ -30,14 +30,20 @@ export default class UserRepository {
     }
 
     getUserRank(user, allUsers) {
+        const userNumCodesFound = this.getNumCodesFound(user);
         const numUsersAhead = allUsers.filter(otherUser => otherUser.name !== user.name &&
-                otherUser.codesFound.length > user.codesFound.length).length;
+            this.getNumCodesFound(otherUser) > userNumCodesFound).length;
         return 1 + numUsersAhead;
     }
 
     getNumUsersTied(user, allUsers) {
+        const userNumCodesFound = this.getNumCodesFound(user);
         return allUsers.filter(otherUser => otherUser.name !== user.name &&
-            otherUser.codesFound.length === user.codesFound.length).length;
+            this.getNumCodesFound(otherUser) === userNumCodesFound).length;
+    }
+
+    getNumCodesFound(user) {
+        return user.codesFound.filter(code => code);
     }
 
     async addCodeFound(userName, code) {
