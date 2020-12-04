@@ -43,7 +43,7 @@ export default class UserRepository {
     }
 
     getNumCodesFound(user) {
-        return user.codesFound.filter(code => code);
+        return user.codesFound.filter(code => code).length;
     }
 
     async addCodeFound(userName, code) {
