@@ -2,7 +2,7 @@
 <div>
     <div v-if="loading">Checking code...</div>
     <div v-if="noGood">That code isn't valid!</div>
-    <div v-if="noGood">You already scanned that code.</div>
+    <div v-if="duplicate">You already scanned that code.</div>
     <router-link to="/codes">Home</router-link>
 </div>
 </template>
@@ -38,8 +38,8 @@ export default {
             this.$router.push('/login');
             return;
         }
-        const { name } = loginResponse.json();
-        const codeResponse = await fetch(`/api/${name}/codesFound/${code}`, {
+        const { name } = await loginResponse.json();
+        const codeResponse = await fetch(`/api/users/${name}/codesFound/${code}`, {
             method: 'PATCH',
             credentials: 'same-origin',
         });
