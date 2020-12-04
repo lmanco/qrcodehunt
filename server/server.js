@@ -65,14 +65,18 @@ app.use('/api/users', new UsersRoutes(express, usersController).router);
 const loginController = new LoginController(userRepository, bcrypt);
 app.use('/api/login', new LoginRoutes(express, loginController).router);
 
+app.all('/api/*', (req, res) => {
+    res.status(StatusCodes.NOT_FOUND).json({ error: 'Resource not found' });
+});
+
 const __dirname = fileURLToPath(import.meta.url);
 app.use(express.static(__dirname + '/public/'));
 app.get(/.*/, (req, res) => {
-    res.sendFile(__dirname + '/public/index.html');
-});
-
-app.all('/api/*', (req, res) => {
-    res.status(StatusCodes.NOT_FOUND).json({ error: 'Resource not found' });
+    const uiPath = `${__dirname}/public/index.html`;
+    if (!fs.existsSync(uiPath))
+        res.status(StatusCodes.NOT_FOUND).send('Web UI missing');
+    else
+        res.sendFile(uiPath);
 });
 
 app.set('port', (process.env.PORT || 8081));
