@@ -69,6 +69,10 @@ export default class UsersController {
                 res.status(StatusCodes.NOT_FOUND).json({ error: `user ${req.params.name} not found` });
                 return;
             }
+            if (req.session.user !== user.name) {
+                res.status(StatusCodes.FORBIDDEN).json({ error: 'Forbidden' });
+                return;
+            }
             const code = await this.codeRepository.getCodeByKey(req.params.key);
             const result = await this.userRepository.addCodeFound(user.name, code);
             delete result.password;
